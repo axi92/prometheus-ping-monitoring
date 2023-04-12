@@ -1,0 +1,32 @@
+version: "3.8"
+
+# More info at https://github.com/pi-hole/docker-pi-hole/ and https://docs.pi-hole.net/
+services:
+  prometheus:
+    image: prom/prometheus:v2.38.0
+    container_name: prometheus
+    restart: unless-stopped
+    hostname: prometheus
+    ports:
+      - 9090:9090
+    command:
+    - --config.file=/etc/prometheus/prometheus.yml
+    volumes:
+    - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    depends_on:
+      - ping_exporter
+  ping_exporter:
+    image: czerwonk/ping_exporter:v1.0.1
+    container_name: ping_exporter
+    restart: unless-stopped
+    hostname: ping_exporter
+    ports:
+      - 9427:9427
+    environment:
+      - DEBUG=1
+    # command:
+    # - ./ping_exporter --config.path /config/ping.yml
+    volumes:
+    - ./ping.yml:/config/config.yml:ro
+    cap_add:
+    - CAP_NET_RAW
